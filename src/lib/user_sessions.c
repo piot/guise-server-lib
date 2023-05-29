@@ -70,8 +70,8 @@ static int userSessionsFind(const UserSessions* self, UserSerializeUserSessionId
     }
     if (!networkAddressEqual(addr, &foundSession->address)) {
         char addrTemp[64];
-        CLOG_C_SOFT_ERROR(&self->log, "wrong address %s vs %s", userAddressToString(addr, addrTemp, 64),
-                          userAddressToString(&foundSession->address, addrTemp, 64));
+        CLOG_C_SOFT_ERROR(&self->log, "wrong address %s vs %s", networkAddressToString(addr, addrTemp, 64),
+                          networkAddressToString(&foundSession->address, addrTemp, 64));
         *outSession = 0;
         return -3;
     }
