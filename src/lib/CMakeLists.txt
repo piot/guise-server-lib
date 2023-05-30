@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(user_server_lib C)
+project(guise_server_lib C)
 
 set(CMAKE_C_STANDARD 99)
 
@@ -20,10 +20,10 @@ set(DEPS ../../deps/)
 
 file(GLOB lib_src FOLLOW_SYMLINKS "*.c")
 
-add_library(user_server_lib STATIC ${lib_src})
+add_library(guise_server_lib STATIC ${lib_src})
 
 target_compile_options(
-        user_server_lib
+        guise_server_lib
         PRIVATE -Wall
         -Wextra
         -Wshadow
@@ -44,24 +44,24 @@ target_compile_options(
 
 if (COMPILER_CLANG)
     target_compile_options(
-            user_server_lib PRIVATE -Wmost -Weverything
+            guise_server_lib PRIVATE -Wmost -Weverything
             -Werror=missing-variable-declarations)
 endif ()
 
-target_include_directories(user_server_lib
+target_include_directories(guise_server_lib
         PUBLIC ${DEPS}piot/flood-c/src/include)
-target_include_directories(user_server_lib
-        PUBLIC ${DEPS}piot/user-serialize-c/src/include)
-target_include_directories(user_server_lib
+target_include_directories(guise_server_lib
+        PUBLIC ${DEPS}piot/guise-serialize-c/src/include)
+target_include_directories(guise_server_lib
         PUBLIC ${DEPS}piot/clog/src/include)
-target_include_directories(user_server_lib
+target_include_directories(guise_server_lib
         PUBLIC ${DEPS}piot/tiny-libc/src/include)
-target_include_directories(user_server_lib
+target_include_directories(guise_server_lib
         PUBLIC ${DEPS}piot/imprint/src/include)
-target_include_directories(user_server_lib
+target_include_directories(guise_server_lib
         PUBLIC ${DEPS}piot/secure-random-c/src/include)
-        target_include_directories(user_server_lib
+        target_include_directories(guise_server_lib
         PUBLIC ${DEPS}piot/user-serialize-c/src/include)
 
 
-target_include_directories(user_server_lib PUBLIC ../include)
+target_include_directories(guise_server_lib PUBLIC ../include)

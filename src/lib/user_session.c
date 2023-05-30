@@ -2,7 +2,7 @@
  *  Copyright (c) Peter Bjorklund. All rights reserved.
  *  Licensed under the MIT License. See LICENSE in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-#include <user-server-lib/user_session.h>
+#include <guise-server-lib/user_session.h>
 
 /// Initialize a user session
 /// @param self
@@ -10,8 +10,8 @@
 /// @param address
 /// @param owner
 /// @param log
-void userSessionInit(UserSession* self, UserSerializeUserSessionId id, const NetworkAddress* address,
-                     const struct User* owner, Clog log)
+void guiseUserSessionInit(GuiseUserSession* self, GuiseSerializeUserSessionId id, const NetworkAddress* address,
+                     const struct GuiseUser* owner, Clog log)
 {
     self->log = log;
     self->userSessionId = id;

@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 #include <stdio.h>
 #include <tiny-libc/tiny_libc.h>
-#include <user-server-lib/address.h>
+#include <guise-server-lib/address.h>
 
 #if TORNADO_OS_WINDOWS
 #include <Ws2tcpip.h>

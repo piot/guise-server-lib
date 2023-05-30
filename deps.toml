@@ -1,10 +1,10 @@
 depsversion = "0.0.0"
 
-name = "piot/user-server-lib"
+name = "piot/guise-server-lib"
 version = "0.0.0"
 
 [[dependencies]]
-name = 'piot/user-serialize-c'
+name = 'piot/guise-serialize-c'
 version = "*"
 
 [[dependencies]]

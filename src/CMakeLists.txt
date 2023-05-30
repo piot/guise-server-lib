@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(user_server_lib C)
+project(guise_server_lib C)
 
 add_subdirectory("lib")
 # add_subdirectory("test")

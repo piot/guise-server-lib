@@ -4,16 +4,16 @@
  *--------------------------------------------------------------------------------------------*/
 #include <clog/clog.h>
 #include <flood/in_stream.h>
-#include <user-serialize/serialize.h>
-#include <user-server-lib/address.h>
-#include <user-server-lib/user.h>
-#include <user-server-lib/users.h>
+#include <guise-serialize/serialize.h>
+#include <guise-server-lib/address.h>
+#include <guise-server-lib/user.h>
+#include <guise-server-lib/users.h>
 
 /*
-int usersCreate(Users* sessions, User* user, const NetworkAddress* address, User** outSession)
+int guiseUsersCreate(GuiseUsers* sessions, GuiseUser* user, const NetworkAddress* address, GuiseUser** outSession)
 {
     for (size_t i = 0; i < sessions->userSessionCapacity; ++i) {
-        User* user = &sessions->users[i];
+        GuiseUser* user = &sessions->guiseUsers[i];
         if (user->name == 0) {
             user->name = tc_str_dup()
             user->user = user;
@@ -25,13 +25,13 @@ int usersCreate(Users* sessions, User* user, const NetworkAddress* address, User
     return -1;
 }
 
-static int usersFind(const Users* self, uint32_t id, const NetworkAddress* addr, User** outSession)
+static int guiseUsersFind(const GuiseUsers* self, uint32_t id, const NetworkAddress* addr, GuiseUser** outSession)
 {
     if (id >= self->capacity) {
         return -2;
     }
 
-    User* foundSession = &self->users[id];
+    GuiseUser* foundSession = &self->guiseUsers[id];
     if (!nimbleAddressEqual(addr, &foundSession->address)) {
         char addrTemp[64];
         CLOG_C_SOFT_ERROR("wrong address %s vs %s", nimbleAddressToString(addr, addrTemp, 64),
@@ -45,13 +45,13 @@ static int usersFind(const Users* self, uint32_t id, const NetworkAddress* addr,
     return 0;
 }
 
- int usersReadAndFind(const Users* self, const NetworkAddress* address, FldInStream* stream,
-    User** outSession)
+ int guiseUsersReadAndFind(const GuiseUsers* self, const NetworkAddress* address, FldInStream* stream,
+    GuiseUser** outSession)
 {
     uint32_t userId;
     fldInStreamReadUInt32(stream, &userId);
 
-    int errorCode = usersFind(self, userId, address, outSession);
+    int errorCode = guiseUsersFind(self, userId, address, outSession);
     if (errorCode < 0) {
         CLOG_C_WARN("couldn't find session %d", sessionId);
         return errorCode;
@@ -64,10 +64,10 @@ static int usersFind(const Users* self, uint32_t id, const NetworkAddress* addr,
 
 */
 
-int usersReadLogin(const Users* self, const char* nameBuf, User** outUser)
+int guiseUsersReadLogin(const GuiseUsers* self, const char* nameBuf, GuiseUser** outUser)
 {
     for (size_t i = 0; i < self->capacity; ++i) {
-        User* user = &self->users[i];
+        GuiseUser* user = &self->guiseUsers[i];
         if (user->name == 0) {
             user->name = tc_str_dup(nameBuf);
             *outUser = user;
@@ -80,18 +80,18 @@ int usersReadLogin(const Users* self, const char* nameBuf, User** outUser)
     return 0;
 }
 
-void usersInit(Users* self, Clog log)
+void guiseUsersInit(GuiseUsers* self, Clog log)
 {
     self->log = log;
     self->capacity = 1024;
-    self->users = tc_malloc_type_count(User, self->capacity);
-    tc_mem_clear_type_n(self->users, self->capacity);
+    self->guiseUsers = tc_malloc_type_count(GuiseUser, self->capacity);
+    tc_mem_clear_type_n(self->guiseUsers, self->capacity);
 }
 
-void usersReset(Users* self)
+void guiseUsersReset(GuiseUsers* self)
 {
     for (size_t i = 0; i < self->capacity; ++i) {
-        User* user = &self->users[i];
+        GuiseUser* user = &self->guiseUsers[i];
         if (user->name) {
             free((void*) user->name);
         }
@@ -99,7 +99,7 @@ void usersReset(Users* self)
     }
 }
 
-void usersDestroy(Users* self)
+void guiseUsersDestroy(GuiseUsers* self)
 {
-    tc_free(self->users);
+    tc_free(self->guiseUsers);
 }

@@ -5,12 +5,12 @@
 #include "cipher.h"
 #include <clog/clog.h>
 #include <flood/in_stream.h>
-#include <user-serialize/server_in.h>
-#include <user-serialize/server_out.h>
-#include <user-server-lib/req_user_login.h>
-#include <user-server-lib/server.h>
-#include <user-server-lib/user.h>
-#include <user-server-lib/user_session.h>
+#include <guise-serialize/server_in.h>
+#include <guise-serialize/server_out.h>
+#include <guise-server-lib/req_user_login.h>
+#include <guise-server-lib/server.h>
+#include <guise-server-lib/user.h>
+#include <guise-server-lib/user_session.h>
 
 /// Try to login a user and creates a user session on success
 /// @param self
@@ -19,7 +19,7 @@
 /// @param len
 /// @param outStream
 /// @return
-int userReqUserLogin(UserServer* self, const NetworkAddress* address, const uint8_t* data, size_t len,
+int guiseReqUserLogin(GuiseServer* self, const NetworkAddress* address, const uint8_t* data, size_t len,
                      struct FldOutStream* outStream)
 {
     if (len == 0) {
@@ -29,11 +29,11 @@ int userReqUserLogin(UserServer* self, const NetworkAddress* address, const uint
     FldInStream inStream;
     fldInStreamInit(&inStream, data, len);
 
-    UserSerializeClientNonce clientNonce;
-    UserSerializeServerChallenge serverChallengeFromClient;
+    GuiseSerializeClientNonce clientNonce;
+    GuiseSerializeServerChallenge serverChallengeFromClient;
     char username[32];
 
-    userSerializeServerInLogin(&inStream, &clientNonce, &serverChallengeFromClient, username, 32);
+    guiseSerializeServerInLogin(&inStream, &clientNonce, &serverChallengeFromClient, username, 32);
 
     // Challenge is done to avoid at least the simplest forms of IP spoofing
     uint64_t calculatedClientNonce = extremelyUnsecureCipher(serverChallengeFromClient, self->secretChallengeKey);
@@ -44,14 +44,14 @@ int userReqUserLogin(UserServer* self, const NetworkAddress* address, const uint
 
     CLOG_C_DEBUG(&self->log, "challenge was approved from client nonce %016lX", clientNonce);
 
-    User* foundUser;
-    int errorCode = usersReadLogin(&self->users, username, &foundUser);
+    GuiseUser* foundUser;
+    int errorCode = guiseUsersReadLogin(&self->guiseUsers, username, &foundUser);
     if (errorCode < 0) {
         return errorCode;
     }
 
-    UserSession* foundSession;
-    int err = userSessionsCreate(&self->userSessions, foundUser, address, &foundSession);
+    GuiseUserSession* foundSession;
+    int err = guiseUserSessionsCreate(&self->guiseUserSessions, foundUser, address, &foundSession);
     if (err < 0) {
         return err;
     }
@@ -59,7 +59,7 @@ int userReqUserLogin(UserServer* self, const NetworkAddress* address, const uint
     CLOG_C_DEBUG(&self->log, "logged in user '%s' and created user session %016lX", foundUser->name,
                  foundSession->userSessionId);
 
-    userSerializeServerOutLogin(outStream, clientNonce, foundSession->userSessionId);
+    guiseSerializeServerOutLogin(outStream, clientNonce, foundSession->userSessionId);
 
     return 0;
 }

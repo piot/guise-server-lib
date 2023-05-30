@@ -4,49 +4,49 @@
  *--------------------------------------------------------------------------------------------*/
 #include <clog/clog.h>
 #include <flood/in_stream.h>
-#include <user-serialize/serialize.h>
-#include <user-server-lib/address.h>
-#include <user-server-lib/unique_id.h>
-#include <user-server-lib/user_session.h>
-#include <user-server-lib/user_sessions.h>
+#include <guise-serialize/serialize.h>
+#include <guise-server-lib/address.h>
+#include <guise-server-lib/unique_id.h>
+#include <guise-server-lib/user_session.h>
+#include <guise-server-lib/user_sessions.h>
 
 /// Initialize the user session collection
 /// @param self
 /// @param log
-void userSessionsInit(UserSessions* self, Clog log)
+void guiseUserSessionsInit(GuiseUserSessions* self, Clog log)
 {
     self->log = log;
     self->userSessionCapacity = 1024;
-    self->userSessions = tc_malloc_type_count(UserSession, self->userSessionCapacity);
-    tc_mem_clear_type_n(self->userSessions, self->userSessionCapacity);
+    self->guiseUserSessions = tc_malloc_type_count(GuiseUserSession, self->userSessionCapacity);
+    tc_mem_clear_type_n(self->guiseUserSessions, self->userSessionCapacity);
 }
 
-void userSessionsReset(UserSessions* self)
+void guiseUserSessionsReset(GuiseUserSessions* self)
 {
     for (size_t i = 0; i < self->userSessionCapacity; ++i) {
-        UserSession* session = &self->userSessions[i];
+        GuiseUserSession* session = &self->guiseUserSessions[i];
         session->user = 0;
     }
 }
 
-void userSessionsDestroy(UserSessions* self)
+void guiseUserSessionsDestroy(GuiseUserSessions* self)
 {
     self->userSessionCapacity = 0;
-    tc_free(self->userSessions);
+    tc_free(self->guiseUserSessions);
 }
 
-int userSessionsCreate(UserSessions* sessions, struct User* user, const NetworkAddress* address,
-                       UserSession** outSession)
+int guiseUserSessionsCreate(GuiseUserSessions* sessions, struct GuiseUser* user, const NetworkAddress* address,
+                       GuiseUserSession** outSession)
 {
     for (size_t i = 0; i < sessions->userSessionCapacity; ++i) {
-        UserSession* session = &sessions->userSessions[i];
+        GuiseUserSession* session = &sessions->guiseUserSessions[i];
         if (session->user == 0) {
             Clog userSessionLog;
             userSessionLog.config = sessions->log.config;
             tc_snprintf(session->prefix, 32, "%s/%zu", sessions->log.constantPrefix, i);
             userSessionLog.constantPrefix = session->prefix;
-            UserSerializeUserSessionId uniqueSessionId = userGenerateUniqueIdFromIndex(i);
-            userSessionInit(session, uniqueSessionId, address, user, userSessionLog);
+            GuiseSerializeUserSessionId uniqueSessionId = guiseGenerateUniqueIdFromIndex(i);
+            guiseUserSessionInit(session, uniqueSessionId, address, user, userSessionLog);
             *outSession = session;
             return 0;
         }
@@ -55,15 +55,15 @@ int userSessionsCreate(UserSessions* sessions, struct User* user, const NetworkA
     return -1;
 }
 
-static int userSessionsFind(const UserSessions* self, UserSerializeUserSessionId uniqueId, const NetworkAddress* addr,
-                            const UserSession** outSession)
+static int guiseUserSessionsFind(const GuiseUserSessions* self, GuiseSerializeUserSessionId uniqueId, const NetworkAddress* addr,
+                            const GuiseUserSession** outSession)
 {
-    size_t index = userUniqueIdGetIndex(uniqueId);
+    size_t index = guiseUniqueIdGetIndex(uniqueId);
     if (index >= self->userSessionCapacity) {
         return -2;
     }
 
-    UserSession* foundSession = &self->userSessions[index];
+    GuiseUserSession* foundSession = &self->guiseUserSessions[index];
     if (foundSession->userSessionId != uniqueId) {
         CLOG_C_SOFT_ERROR(&self->log, "wrong user session id, got %016X but wanted %016X", uniqueId,
                           foundSession->userSessionId);
@@ -81,14 +81,14 @@ static int userSessionsFind(const UserSessions* self, UserSerializeUserSessionId
     return 0;
 }
 
-int userSessionsReadAndFind(const UserSessions* self, const NetworkAddress* address, FldInStream* stream,
-                            const UserSession** outSession)
+int guiseUserSessionsReadAndFind(const GuiseUserSessions* self, const NetworkAddress* address, FldInStream* stream,
+                            const GuiseUserSession** outSession)
 {
 
-    UserSerializeUserSessionId userSessionId;
-    userSerializeReadUserSessionId(stream, &userSessionId);
+    GuiseSerializeUserSessionId userSessionId;
+    guiseSerializeReadUserSessionId(stream, &userSessionId);
 
-    int errorCode = userSessionsFind(self, userSessionId, address, outSession);
+    int errorCode = guiseUserSessionsFind(self, userSessionId, address, outSession);
     if (errorCode < 0) {
         CLOG_C_WARN(&self->log, "couldn't find user session %d", userSessionId);
         return errorCode;
