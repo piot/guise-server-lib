@@ -11,6 +11,7 @@
 #include <guise-server-lib/server.h>
 #include <guise-server-lib/user.h>
 #include <guise-server-lib/user_session.h>
+#include <tiny-libc/tiny_libc.h>
 
 /// Try to login a user and creates a user session on success
 /// @param self
@@ -20,7 +21,7 @@
 /// @param outStream
 /// @return
 int guiseReqUserLogin(GuiseServer* self, const NetworkAddress* address, const uint8_t* data, size_t len,
-                     struct FldOutStream* outStream)
+                      struct FldOutStream* outStream)
 {
     if (len == 0) {
         return -2;
@@ -30,22 +31,15 @@ int guiseReqUserLogin(GuiseServer* self, const NetworkAddress* address, const ui
     fldInStreamInit(&inStream, data, len);
 
     GuiseSerializeClientNonce clientNonce;
-    GuiseSerializeServerChallenge serverChallengeFromClient;
-    char username[32];
+    GuiseSerializeUserId userId;
+    GuiseSerializePasswordHashWithChallenge passwordHashedWithChallenge;
 
-    guiseSerializeServerInLogin(&inStream, &clientNonce, &serverChallengeFromClient, username, 32);
-
-    // Challenge is done to avoid at least the simplest forms of IP spoofing
-    uint64_t calculatedClientNonce = extremelyUnsecureCipher(serverChallengeFromClient, self->secretChallengeKey);
-    if (calculatedClientNonce != clientNonce) {
-        CLOG_C_SOFT_ERROR(&self->log, "challenge didnt work out")
-        return -2;
-    }
+    guiseSerializeServerInLogin(&inStream, &clientNonce, &userId, &passwordHashedWithChallenge);
 
     CLOG_C_DEBUG(&self->log, "challenge was approved from client nonce %016lX", clientNonce);
 
     GuiseUser* foundUser;
-    int errorCode = guiseUsersReadLogin(&self->guiseUsers, username, &foundUser);
+    int errorCode = guiseUsersFind(&self->guiseUsers, userId, passwordHashedWithChallenge, &foundUser);
     if (errorCode < 0) {
         return errorCode;
     }
@@ -56,10 +50,12 @@ int guiseReqUserLogin(GuiseServer* self, const NetworkAddress* address, const ui
         return err;
     }
 
-    CLOG_C_DEBUG(&self->log, "logged in user '%s' and created user session %016lX", foundUser->name,
+    CLOG_C_DEBUG(&self->log, "logged in user '%d' and created user session %016lX", foundUser->name,
                  foundSession->userSessionId);
 
-    guiseSerializeServerOutLogin(outStream, clientNonce, foundSession->userSessionId);
+    GuiseSerializeUserName serializeUserName;
+    tc_strcpy(serializeUserName.utf8, 32, foundUser->name);
+    guiseSerializeServerOutLogin(outStream, clientNonce, &serializeUserName, foundSession->userSessionId);
 
     return 0;
 }

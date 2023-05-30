@@ -23,9 +23,11 @@ typedef struct GuiseUsers {
 void guiseUsersInit(GuiseUsers* self, Clog log);
 void guiseUsersReset(GuiseUsers* self);
 void guiseUsersDestroy(GuiseUsers* self);
-int guiseUsersCreate(GuiseUsers* sessions, struct GuiseUser* user, const NetworkAddress* address, struct GuiseUser** outUser);
-int guiseUsersReadAndFind(const GuiseUsers* self, const NetworkAddress* address, struct FldInStream* stream,
-                     struct GuiseUser** outUser);
+int guiseUsersCreate(GuiseUsers* self, GuiseSerializeUserId userId, struct GuiseUser** outUser);
+struct GuiseUser* guiseUsersFindFromUserId(const GuiseUsers* self, GuiseSerializeUserId userId);
+
+int guiseUsersFind(const GuiseUsers* self, GuiseSerializeUserId userId,
+                   const GuiseSerializePasswordHashWithChallenge password, struct GuiseUser** outUser);
 int guiseUsersReadLogin(const GuiseUsers* self, const char* name, struct GuiseUser** outUser);
 
 #endif

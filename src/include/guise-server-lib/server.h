@@ -20,7 +20,6 @@ typedef struct GuiseServer {
     GuiseUsers guiseUsers;
     GuiseUserSessions guiseUserSessions;
     Clog log;
-    GuiseSerializeServerChallenge secretChallengeKey;
 } GuiseServer;
 
 int guiseServerInit(GuiseServer* self, struct ImprintAllocator* memory, Clog log);

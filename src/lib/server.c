@@ -72,16 +72,15 @@ int guiseServerInit(GuiseServer* self, struct ImprintAllocator* memory, Clog log
 {
     self->log = log;
 
-    self->secretChallengeKey = secureRandomUInt64();
 
     Clog subLog;
     subLog.config = log.config;
 
-    tc_snprintf(self->guiseUserSessions.prefix, 32, "%s/guiseUsersessions", log.constantPrefix);
+    tc_snprintf(self->guiseUserSessions.prefix, 32, "%s/usersessions", log.constantPrefix);
     subLog.constantPrefix = self->guiseUserSessions.prefix;
     guiseUserSessionsInit(&self->guiseUserSessions, subLog);
 
-    tc_snprintf(self->guiseUsers.prefix, 32, "%s/guiseUsers", log.constantPrefix);
+    tc_snprintf(self->guiseUsers.prefix, 32, "%s/users", log.constantPrefix);
     subLog.constantPrefix = self->guiseUsers.prefix;
     guiseUsersInit(&self->guiseUsers, subLog);
 

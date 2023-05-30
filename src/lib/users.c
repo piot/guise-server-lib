@@ -2,6 +2,7 @@
  *  Copyright (c) Peter Bjorklund. All rights reserved.
  *  Licensed under the MIT License. See LICENSE in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
+#include "cipher.h"
 #include <clog/clog.h>
 #include <flood/in_stream.h>
 #include <guise-serialize/serialize.h>
@@ -9,21 +10,22 @@
 #include <guise-server-lib/user.h>
 #include <guise-server-lib/users.h>
 
-/*
-int guiseUsersCreate(GuiseUsers* sessions, GuiseUser* user, const NetworkAddress* address, GuiseUser** outSession)
+int guiseUsersCreate(GuiseUsers* self, GuiseSerializeUserId userId, GuiseUser** outUser)
 {
-    for (size_t i = 0; i < sessions->userSessionCapacity; ++i) {
-        GuiseUser* user = &sessions->guiseUsers[i];
-        if (user->name == 0) {
-            user->name = tc_str_dup()
-            user->user = user;
-            *outSession = user;
+    for (size_t i = 0; i < self->capacity; ++i) {
+        GuiseUser* user = &self->guiseUsers[i];
+        if (user->id == 0) {
+            user->id = userId;
+            *outUser = user;
             return i;
         }
     }
-    *outSession = 0;
+    *outUser = 0;
     return -1;
 }
+
+/*
+
 
 static int guiseUsersFind(const GuiseUsers* self, uint32_t id, const NetworkAddress* addr, GuiseUser** outSession)
 {
@@ -64,20 +66,38 @@ static int guiseUsersFind(const GuiseUsers* self, uint32_t id, const NetworkAddr
 
 */
 
-int guiseUsersReadLogin(const GuiseUsers* self, const char* nameBuf, GuiseUser** outUser)
+GuiseUser* guiseUsersFindFromUserId(const GuiseUsers* self, const GuiseSerializeUserId userId)
 {
     for (size_t i = 0; i < self->capacity; ++i) {
         GuiseUser* user = &self->guiseUsers[i];
-        if (user->name == 0) {
-            user->name = tc_str_dup(nameBuf);
-            *outUser = user;
-            return i;
+        if (user->id == userId) {
+            return user;
+        }
+    }
+    return 0;
+}
+
+int guiseUsersFind(const GuiseUsers* self, const GuiseSerializeUserId userId,
+                   const GuiseSerializePasswordHashWithChallenge passwordHashWithChallenge, GuiseUser** outUser)
+{
+    for (size_t i = 0; i < self->capacity; ++i) {
+        GuiseUser* user = &self->guiseUsers[i];
+        if (user->id == userId) {
+            uint64_t correctHash = extremelyUnsecureCipher(user->randomChallenge, user->passwordHash);
+            if (correctHash == passwordHashWithChallenge) {
+                *outUser = user;
+                return i;
+            } else {
+                CLOG_C_NOTICE(&self->log, "hash mismatch, can not be logged in correct:%016llx provided:%016llx", correctHash, passwordHashWithChallenge)
+                return -4;
+            }
         }
     }
 
+    CLOG_C_NOTICE(&self->log, "unknown userId %016llx, can not be logged in", userId)
     *outUser = 0;
 
-    return 0;
+    return -1;
 }
 
 void guiseUsersInit(GuiseUsers* self, Clog log)
@@ -92,10 +112,7 @@ void guiseUsersReset(GuiseUsers* self)
 {
     for (size_t i = 0; i < self->capacity; ++i) {
         GuiseUser* user = &self->guiseUsers[i];
-        if (user->name) {
-            free((void*) user->name);
-        }
-        user->name = 0;
+        user->id = 0;
     }
 }
 
