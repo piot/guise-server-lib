@@ -36,7 +36,7 @@ int guiseReqUserLogin(GuiseServer* self, const NetworkAddress* address, const ui
 
     guiseSerializeServerInLogin(&inStream, &clientNonce, &userId, &passwordHashedWithChallenge);
 
-    CLOG_C_DEBUG(&self->log, "challenge was approved from client nonce %" PRIx64, clientNonce);
+    CLOG_C_DEBUG(&self->log, "challenge was approved from client nonce %" PRIx64, clientNonce)
 
     GuiseUser* foundUser;
     int errorCode = guiseUsersFind(&self->guiseUsers, userId, passwordHashedWithChallenge, &foundUser);
@@ -51,7 +51,7 @@ int guiseReqUserLogin(GuiseServer* self, const NetworkAddress* address, const ui
     }
 
     CLOG_C_DEBUG(&self->log, "logged in user '%s' and created user session %" PRIx64, foundUser->name,
-                 foundSession->userSessionId);
+                 foundSession->userSessionId)
 
     GuiseSerializeUserName serializeUserName;
     tc_strcpy(serializeUserName.utf8, 32, foundUser->name);
