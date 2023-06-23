@@ -49,7 +49,7 @@ int guiseServerFeed(GuiseServer* self, const NetworkAddress* address, const uint
             }
             switch (data[0]) {
                 default:
-                    CLOG_C_SOFT_ERROR(&self->log, "guiseServerFeed: unknown command %02X", data[0]);
+                    CLOG_C_SOFT_ERROR(&self->log, "guiseServerFeed: unknown command %02X", data[0])
                     return 0;
             }
         }
