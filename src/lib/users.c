@@ -9,6 +9,7 @@
 #include <guise-server-lib/address.h>
 #include <guise-server-lib/user.h>
 #include <guise-server-lib/users.h>
+#include <inttypes.h>
 
 int guiseUsersCreate(GuiseUsers* self, GuiseSerializeUserId userId, GuiseUser** outUser)
 {
@@ -88,13 +89,13 @@ int guiseUsersFind(const GuiseUsers* self, const GuiseSerializeUserId userId,
                 *outUser = user;
                 return (int) i;
             } else {
-                CLOG_C_NOTICE(&self->log, "hash mismatch, can not be logged in correct:%016llx provided:%016llx", correctHash, passwordHashWithChallenge)
+                CLOG_C_NOTICE(&self->log, "hash mismatch, can not be logged in correct:%" PRIx64 " provided:%" PRIx64, correctHash, passwordHashWithChallenge)
                 return -4;
             }
         }
     }
 
-    CLOG_C_NOTICE(&self->log, "unknown userId %016llx, can not be logged in", userId)
+    CLOG_C_NOTICE(&self->log, "unknown userId %" PRIx64 ", can not be logged in", userId)
     *outUser = 0;
 
     return -1;
