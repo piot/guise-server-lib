@@ -11,7 +11,7 @@
 #include <guise-server-lib/server.h>
 #include <guise-server-lib/user.h>
 #include <guise-server-lib/user_session.h>
-#include <tiny-libc/tiny_libc.h>
+#include <inttypes.h>
 
 /// Try to login a user and creates a user session on success
 /// @param self
@@ -36,7 +36,7 @@ int guiseReqUserLogin(GuiseServer* self, const NetworkAddress* address, const ui
 
     guiseSerializeServerInLogin(&inStream, &clientNonce, &userId, &passwordHashedWithChallenge);
 
-    CLOG_C_DEBUG(&self->log, "challenge was approved from client nonce %016lX", clientNonce);
+    CLOG_C_DEBUG(&self->log, "challenge was approved from client nonce %" PRIx64, clientNonce);
 
     GuiseUser* foundUser;
     int errorCode = guiseUsersFind(&self->guiseUsers, userId, passwordHashedWithChallenge, &foundUser);
@@ -50,7 +50,7 @@ int guiseReqUserLogin(GuiseServer* self, const NetworkAddress* address, const ui
         return err;
     }
 
-    CLOG_C_DEBUG(&self->log, "logged in user '%d' and created user session %016lX", foundUser->name,
+    CLOG_C_DEBUG(&self->log, "logged in user '%s' and created user session %" PRIx64, foundUser->name,
                  foundSession->userSessionId);
 
     GuiseSerializeUserName serializeUserName;

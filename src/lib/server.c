@@ -52,7 +52,6 @@ int guiseServerFeed(GuiseServer* self, const NetworkAddress* address, const uint
                     CLOG_C_SOFT_ERROR(&self->log, "guiseServerFeed: unknown command %02X", data[0]);
                     return 0;
             }
-            break;
         }
     }
 
@@ -70,8 +69,8 @@ int guiseServerFeed(GuiseServer* self, const NetworkAddress* address, const uint
 /// @return
 int guiseServerInit(GuiseServer* self, struct ImprintAllocator* memory, Clog log)
 {
+    (void) memory;
     self->log = log;
-
 
     Clog subLog;
     subLog.config = log.config;

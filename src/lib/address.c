@@ -6,7 +6,7 @@
 #include <tiny-libc/tiny_libc.h>
 #include <guise-server-lib/address.h>
 
-#if TORNADO_OS_WINDOWS
+#ifdef TORNADO_OS_WINDOWS
 #include <Ws2tcpip.h>
 #endif
 
@@ -17,7 +17,7 @@ int networkAddressEqual(const NetworkAddress* a, const NetworkAddress* b)
 
 const char* networkAddressToString(const NetworkAddress* self, char* temp, size_t maxCount)
 {
-    const char* converted = inet_ntop(AF_INET, &self->sin_addr, temp, maxCount - 6);
+    const char* converted = inet_ntop(AF_INET, &self->sin_addr, temp, (socklen_t) maxCount - 6);
 
     size_t len = tc_strlen(converted);
 

@@ -12,10 +12,12 @@
 #include <guise-server-lib/user.h>
 #include <guise-server-lib/user_session.h>
 #include <secure-random/secure_random.h>
+#include <inttypes.h>
 
 int guiseReqChallenge(GuiseServer* self, const NetworkAddress* address, const uint8_t* data, size_t len,
                       struct FldOutStream* outStream)
 {
+    (void) address;
     FldInStream inStream;
     fldInStreamInit(&inStream, data, len);
 
@@ -30,7 +32,7 @@ int guiseReqChallenge(GuiseServer* self, const NetworkAddress* address, const ui
 
     user->randomChallenge = secureRandomUInt64();
 
-    CLOG_C_VERBOSE(&self->log, "received challenge request from client nonce %016lX and constructed challenge %016lX",
+    CLOG_C_VERBOSE(&self->log, "received challenge request from client nonce %" PRIx64 " and constructed challenge %" PRIx64,
                    clientNonce, user->randomChallenge)
 
     return guiseSerializeServerOutChallenge(outStream, clientNonce, user->randomChallenge);

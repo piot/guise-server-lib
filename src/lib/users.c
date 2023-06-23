@@ -17,7 +17,7 @@ int guiseUsersCreate(GuiseUsers* self, GuiseSerializeUserId userId, GuiseUser** 
         if (user->id == 0) {
             user->id = userId;
             *outUser = user;
-            return i;
+            return (int)i;
         }
     }
     *outUser = 0;
@@ -86,7 +86,7 @@ int guiseUsersFind(const GuiseUsers* self, const GuiseSerializeUserId userId,
             uint64_t correctHash = extremelyUnsecureCipher(user->randomChallenge, user->passwordHash);
             if (correctHash == passwordHashWithChallenge) {
                 *outUser = user;
-                return i;
+                return (int) i;
             } else {
                 CLOG_C_NOTICE(&self->log, "hash mismatch, can not be logged in correct:%016llx provided:%016llx", correctHash, passwordHashWithChallenge)
                 return -4;

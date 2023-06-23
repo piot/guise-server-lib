@@ -9,6 +9,7 @@
 #include <guise-server-lib/unique_id.h>
 #include <guise-server-lib/user_session.h>
 #include <guise-server-lib/user_sessions.h>
+#include <inttypes.h>
 
 /// Initialize the user session collection
 /// @param self
@@ -65,7 +66,7 @@ static int guiseUserSessionsFind(const GuiseUserSessions* self, GuiseSerializeUs
 
     GuiseUserSession* foundSession = &self->guiseUserSessions[index];
     if (foundSession->userSessionId != uniqueId) {
-        CLOG_C_SOFT_ERROR(&self->log, "wrong user session id, got %016X but wanted %016X", uniqueId,
+        CLOG_C_SOFT_ERROR(&self->log, "wrong user session id, got %" PRIx64 " but wanted %" PRIx64, uniqueId,
                           foundSession->userSessionId);
     }
     if (!networkAddressEqual(addr, &foundSession->address)) {
@@ -90,7 +91,7 @@ int guiseUserSessionsReadAndFind(const GuiseUserSessions* self, const NetworkAdd
 
     int errorCode = guiseUserSessionsFind(self, userSessionId, address, outSession);
     if (errorCode < 0) {
-        CLOG_C_WARN(&self->log, "couldn't find user session %d", userSessionId);
+        CLOG_C_WARN(&self->log, "couldn't find user session %" PRIx64, userSessionId);
         return errorCode;
     }
 
