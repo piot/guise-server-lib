@@ -67,12 +67,12 @@ static int guiseUserSessionsFind(const GuiseUserSessions* self, GuiseSerializeUs
     GuiseUserSession* foundSession = &self->guiseUserSessions[index];
     if (foundSession->userSessionId != uniqueId) {
         CLOG_C_SOFT_ERROR(&self->log, "wrong user session id, got %" PRIx64 " but wanted %" PRIx64, uniqueId,
-                          foundSession->userSessionId);
+                          foundSession->userSessionId)
     }
     if (!networkAddressEqual(addr, &foundSession->address)) {
         char addrTemp[64];
         CLOG_C_SOFT_ERROR(&self->log, "wrong address %s vs %s", networkAddressToString(addr, addrTemp, 64),
-                          networkAddressToString(&foundSession->address, addrTemp, 64));
+                          networkAddressToString(&foundSession->address, addrTemp, 64))
         *outSession = 0;
         return -3;
     }
@@ -91,7 +91,7 @@ int guiseUserSessionsReadAndFind(const GuiseUserSessions* self, const NetworkAdd
 
     int errorCode = guiseUserSessionsFind(self, userSessionId, address, outSession);
     if (errorCode < 0) {
-        CLOG_C_WARN(&self->log, "couldn't find user session %" PRIx64, userSessionId);
+        CLOG_C_WARN(&self->log, "couldn't find user session %" PRIx64, userSessionId)
         return errorCode;
     }
 
