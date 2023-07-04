@@ -17,12 +17,12 @@
 #include <guise-server-lib/utils.h>
 
 /// Handle incoming datagrams
-/// @param self
-/// @param address
-/// @param data
-/// @param len
-/// @param response
-/// @return
+/// @param self guise server
+/// @param address address that the datagram came from
+/// @param data the datagram payload
+/// @param len the octet size of data
+/// @param response response information
+/// @return negative on error
 int guiseServerFeed(GuiseServer* self, const NetworkAddress* address, const uint8_t* data, size_t len,
                    GuiseServerResponse* response)
 {
@@ -63,10 +63,10 @@ int guiseServerFeed(GuiseServer* self, const NetworkAddress* address, const uint
 }
 
 /// Initialize the user server
-/// @param self
-/// @param memory
-/// @param log
-/// @return
+/// @param self guise server
+/// @param memory memory
+/// @param log target log
+/// @return zero
 int guiseServerInit(GuiseServer* self, struct ImprintAllocator* memory, Clog log)
 {
     (void) memory;

@@ -5,11 +5,11 @@
 #include <guise-server-lib/user_session.h>
 
 /// Initialize a user session
-/// @param self
-/// @param id
-/// @param address
-/// @param owner
-/// @param log
+/// @param self user session
+/// @param id user session id
+/// @param address network address for the session
+/// @param owner owner of the session
+/// @param log target log
 void guiseUserSessionInit(GuiseUserSession* self, GuiseSerializeUserSessionId id, const NetworkAddress* address,
                      const struct GuiseUser* owner, Clog log)
 {
