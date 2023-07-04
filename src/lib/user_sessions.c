@@ -12,8 +12,8 @@
 #include <inttypes.h>
 
 /// Initialize the user session collection
-/// @param self
-/// @param log
+/// @param self user sessions
+/// @param log target log
 void guiseUserSessionsInit(GuiseUserSessions* self, Clog log)
 {
     self->log = log;
@@ -70,7 +70,7 @@ static int guiseUserSessionsFind(const GuiseUserSessions* self, GuiseSerializeUs
                           foundSession->userSessionId)
     }
     if (!networkAddressEqual(addr, &foundSession->address)) {
-        char addrTemp[64];
+        CLOG_EXECUTE(char addrTemp[64];)
         CLOG_C_SOFT_ERROR(&self->log, "wrong address %s vs %s", networkAddressToString(addr, addrTemp, 64),
                           networkAddressToString(&foundSession->address, addrTemp, 64))
         *outSession = 0;

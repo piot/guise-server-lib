@@ -14,12 +14,12 @@
 #include <inttypes.h>
 
 /// Try to login a user and creates a user session on success
-/// @param self
-/// @param address
-/// @param data
-/// @param len
-/// @param outStream
-/// @return
+/// @param self guise server
+/// @param address address that the request came from
+/// @param data the data following the login request
+/// @param len octet size of data
+/// @param outStream response out stream
+/// @return negative on error
 int guiseReqUserLogin(GuiseServer* self, const NetworkAddress* address, const uint8_t* data, size_t len,
                       struct FldOutStream* outStream)
 {
