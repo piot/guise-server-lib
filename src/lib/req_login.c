@@ -13,6 +13,7 @@
 #include <guise-server-lib/user_session.h>
 #include <inttypes.h>
 
+
 /// Try to login a user and creates a user session on success
 /// @param self guise server
 /// @param address address that the request came from
@@ -50,12 +51,14 @@ int guiseReqUserLogin(GuiseServer* self, const NetworkAddress* address, const ui
         return err;
     }
 
-    CLOG_C_DEBUG(&self->log, "logged in user '%s' and created user session %" PRIx64, foundUser->name,
+    CLOG_C_DEBUG(&self->log, "logged in user '%s' and created user session %" PRIx64, foundUser->name.utf8,
                  foundSession->userSessionId)
 
-    GuiseSerializeUserName serializeUserName;
-    tc_strcpy(serializeUserName.utf8, 32, foundUser->name);
-    guiseSerializeServerOutLogin(outStream, clientNonce, &serializeUserName, foundSession->userSessionId);
+    GuiseSerializeAddress serializeAddress;
+    networkAddressToSerializeAddress(&serializeAddress, foundSession->address);
+
+    guiseSerializeServerOutLogin(outStream, clientNonce, &foundUser->name, foundSession->userSessionId,
+                                 &serializeAddress);
 
     return 0;
 }

@@ -11,6 +11,7 @@
 #include <guise-server-lib/address.h>
 #include <guise-server-lib/req_challenge.h>
 #include <guise-server-lib/req_user_login.h>
+#include <guise-server-lib/req_session_query.h>
 #include <guise-server-lib/server.h>
 #include <guise-server-lib/user.h>
 #include <guise-server-lib/user_session.h>
@@ -48,6 +49,9 @@ int guiseServerFeed(GuiseServer* self, const NetworkAddress* address, const uint
                 return err;
             }
             switch (data[0]) {
+                case guiseSerializeCmdConfirmInfoRequest:
+                    result = guiseReqSessionQuery(self, foundUserSession, &inStream, &outStream);
+                    break;
                 default:
                     CLOG_C_SOFT_ERROR(&self->log, "guiseServerFeed: unknown command %02X", data[0])
                     return 0;

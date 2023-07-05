@@ -56,11 +56,12 @@ int guiseUserSessionsCreate(GuiseUserSessions* sessions, struct GuiseUser* user,
     return -1;
 }
 
-static int guiseUserSessionsFind(const GuiseUserSessions* self, GuiseSerializeUserSessionId uniqueId, const NetworkAddress* addr,
+int guiseUserSessionsFind(const GuiseUserSessions* self, GuiseSerializeUserSessionId uniqueId, const NetworkAddress* addr,
                             const GuiseUserSession** outSession)
 {
     size_t index = guiseUniqueIdGetIndex(uniqueId);
     if (index >= self->userSessionCapacity) {
+        CLOG_C_SOFT_ERROR(&self->log, "user session index is wrong %zu out of %zu", index, self->userSessionCapacity)
         return -2;
     }
 
@@ -70,9 +71,9 @@ static int guiseUserSessionsFind(const GuiseUserSessions* self, GuiseSerializeUs
                           foundSession->userSessionId)
     }
     if (!networkAddressEqual(addr, &foundSession->address)) {
-        CLOG_EXECUTE(char addrTemp[64];)
+        CLOG_EXECUTE(char addrTemp[64]; char addrTemp2[64];)
         CLOG_C_SOFT_ERROR(&self->log, "wrong address %s vs %s", networkAddressToString(addr, addrTemp, 64),
-                          networkAddressToString(&foundSession->address, addrTemp, 64))
+                          networkAddressToString(&foundSession->address, addrTemp2, 64))
         *outSession = 0;
         return -3;
     }

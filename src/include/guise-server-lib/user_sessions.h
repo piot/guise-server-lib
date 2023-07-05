@@ -28,5 +28,6 @@ int guiseUserSessionsCreate(GuiseUserSessions* sessions, struct GuiseUser* user,
                        struct GuiseUserSession** outSession);
 int guiseUserSessionsReadAndFind(const GuiseUserSessions* self, const NetworkAddress* address, struct FldInStream* stream,
                             const struct GuiseUserSession** outSession);
-
+int guiseUserSessionsFind(const GuiseUserSessions* self, GuiseSerializeUserSessionId uniqueId, const NetworkAddress* addr,
+                            const struct GuiseUserSession** outSession);
 #endif

@@ -6,8 +6,9 @@
 #define GUISE_SERVER_USER_H
 
 typedef struct GuiseUser {
-    char name[33];
+    GuiseSerializeUserName name;
     GuiseSerializeUserId id;
+    GuiseSerializeRole roles;
     uint64_t passwordHash;
     uint64_t randomChallenge;
 } GuiseUser;
