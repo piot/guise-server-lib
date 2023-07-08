@@ -6,7 +6,6 @@
 #include <clog/clog.h>
 #include <flood/in_stream.h>
 #include <guise-serialize/serialize.h>
-#include <guise-server-lib/address.h>
 #include <guise-server-lib/user.h>
 #include <guise-server-lib/users.h>
 #include <inttypes.h>
@@ -18,7 +17,7 @@ int guiseUsersCreate(GuiseUsers* self, GuiseSerializeUserId userId, GuiseUser** 
         if (user->id == 0) {
             user->id = userId;
             *outUser = user;
-            return (int)i;
+            return (int) i;
         }
     }
     *outUser = 0;
@@ -89,7 +88,8 @@ int guiseUsersFind(const GuiseUsers* self, const GuiseSerializeUserId userId,
                 *outUser = user;
                 return (int) i;
             } else {
-                CLOG_C_NOTICE(&self->log, "hash mismatch, can not be logged in correct:%" PRIx64 " provided:%" PRIx64, correctHash, passwordHashWithChallenge)
+                CLOG_C_NOTICE(&self->log, "hash mismatch, can not be logged in correct:%" PRIx64 " provided:%" PRIx64,
+                              correctHash, passwordHashWithChallenge)
                 return -4;
             }
         }

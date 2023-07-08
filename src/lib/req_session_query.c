@@ -35,11 +35,9 @@ int guiseReqSessionQuery(GuiseServer* self, const GuiseUserSession* userSession,
     // NetworkAddress* addr,
     //                             const GuiseUserSession** outSession);
 
-    NetworkAddress convertedNetworkAddressToUseForLookup;
-    networkAddressFromSerializeAddress(&convertedNetworkAddressToUseForLookup, &addressToLookup);
     const GuiseUserSession* foundSession;
-    int findErr = guiseUserSessionsFind(&self->guiseUserSessions, sessionIdToLookup,
-                                        &convertedNetworkAddressToUseForLookup, &foundSession);
+    int findErr = guiseUserSessionsFindWithoutAddressRequirement(&self->guiseUserSessions, sessionIdToLookup,
+                                                                 &foundSession);
     if (findErr < 0) {
         return findErr;
     }

@@ -30,4 +30,6 @@ int guiseUserSessionsReadAndFind(const GuiseUserSessions* self, const NetworkAdd
                             const struct GuiseUserSession** outSession);
 int guiseUserSessionsFind(const GuiseUserSessions* self, GuiseSerializeUserSessionId uniqueId, const NetworkAddress* addr,
                             const struct GuiseUserSession** outSession);
+int guiseUserSessionsFindWithoutAddressRequirement(const GuiseUserSessions* self, GuiseSerializeUserSessionId uniqueId,
+                                                   const struct GuiseUserSession** outSession);
 #endif

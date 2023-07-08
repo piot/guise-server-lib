@@ -5,17 +5,16 @@
 #include <clog/clog.h>
 #include <flood/in_stream.h>
 #include <flood/out_stream.h>
-#include <imprint/allocator.h>
-#include <secure-random/secure_random.h>
 #include <guise-serialize/commands.h>
 #include <guise-server-lib/address.h>
 #include <guise-server-lib/req_challenge.h>
-#include <guise-server-lib/req_user_login.h>
 #include <guise-server-lib/req_session_query.h>
+#include <guise-server-lib/req_user_login.h>
 #include <guise-server-lib/server.h>
 #include <guise-server-lib/user.h>
 #include <guise-server-lib/user_session.h>
 #include <guise-server-lib/utils.h>
+#include <imprint/allocator.h>
 
 /// Handle incoming datagrams
 /// @param self guise server
@@ -25,7 +24,7 @@
 /// @param response response information
 /// @return negative on error
 int guiseServerFeed(GuiseServer* self, const NetworkAddress* address, const uint8_t* data, size_t len,
-                   GuiseServerResponse* response)
+                    GuiseServerResponse* response)
 {
     // CLOG_C_VERBOSE("guiseServerFeed: feed: %s octetCount: %zu", guiseSerializeCmdToString(data[0]), len)
 #define UDP_MAX_SIZE (1200)

@@ -37,7 +37,7 @@ void guiseUserSessionsDestroy(GuiseUserSessions* self)
 }
 
 int guiseUserSessionsCreate(GuiseUserSessions* sessions, struct GuiseUser* user, const NetworkAddress* address,
-                       GuiseUserSession** outSession)
+                            GuiseUserSession** outSession)
 {
     for (size_t i = 0; i < sessions->userSessionCapacity; ++i) {
         GuiseUserSession* session = &sessions->guiseUserSessions[i];
@@ -56,8 +56,28 @@ int guiseUserSessionsCreate(GuiseUserSessions* sessions, struct GuiseUser* user,
     return -1;
 }
 
-int guiseUserSessionsFind(const GuiseUserSessions* self, GuiseSerializeUserSessionId uniqueId, const NetworkAddress* addr,
-                            const GuiseUserSession** outSession)
+int guiseUserSessionsFind(const GuiseUserSessions* self, GuiseSerializeUserSessionId uniqueId,
+                          const NetworkAddress* addr, const GuiseUserSession** outSession)
+{
+    int lookupErr = guiseUserSessionsFindWithoutAddressRequirement(self, uniqueId, outSession);
+    if (lookupErr < 0) {
+        return lookupErr;
+    }
+
+    if (!networkAddressEqual(addr, &(*outSession)->address)) {
+        CLOG_EXECUTE(char addrTemp[64]; char addrTemp2[64];)
+        CLOG_C_SOFT_ERROR(&self->log, "wrong address encountered %s but expected %s",
+                          networkAddressToString(addr, addrTemp, 64),
+                          networkAddressToString(&(*outSession)->address, addrTemp2, 64))
+        *outSession = 0;
+        return -3;
+    }
+
+    return 0;
+}
+
+int guiseUserSessionsFindWithoutAddressRequirement(const GuiseUserSessions* self, GuiseSerializeUserSessionId uniqueId,
+                                                   const GuiseUserSession** outSession)
 {
     size_t index = guiseUniqueIdGetIndex(uniqueId);
     if (index >= self->userSessionCapacity) {
@@ -67,16 +87,10 @@ int guiseUserSessionsFind(const GuiseUserSessions* self, GuiseSerializeUserSessi
 
     GuiseUserSession* foundSession = &self->guiseUserSessions[index];
     if (foundSession->userSessionId != uniqueId) {
-        CLOG_C_SOFT_ERROR(&self->log, "wrong user session id, got %" PRIx64 " but wanted %" PRIx64, uniqueId,
-                          foundSession->userSessionId)
+        CLOG_C_SOFT_ERROR(&self->log, "wrong user session id, got %" PRIx64 " but wanted %" PRIx64 " at index: %zu",
+                          uniqueId, foundSession->userSessionId, index)
     }
-    if (!networkAddressEqual(addr, &foundSession->address)) {
-        CLOG_EXECUTE(char addrTemp[64]; char addrTemp2[64];)
-        CLOG_C_SOFT_ERROR(&self->log, "wrong address %s vs %s", networkAddressToString(addr, addrTemp, 64),
-                          networkAddressToString(&foundSession->address, addrTemp2, 64))
-        *outSession = 0;
-        return -3;
-    }
+    CLOG_ASSERT(foundSession->user != 0, "user session is invalid")
 
     *outSession = foundSession;
 
@@ -84,7 +98,7 @@ int guiseUserSessionsFind(const GuiseUserSessions* self, GuiseSerializeUserSessi
 }
 
 int guiseUserSessionsReadAndFind(const GuiseUserSessions* self, const NetworkAddress* address, FldInStream* stream,
-                            const GuiseUserSession** outSession)
+                                 const GuiseUserSession** outSession)
 {
 
     GuiseSerializeUserSessionId userSessionId;

@@ -2,7 +2,6 @@
  *  Copyright (c) Peter Bjorklund. All rights reserved.
  *  Licensed under the MIT License. See LICENSE in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-#include "cipher.h"
 #include <clog/clog.h>
 #include <flood/in_stream.h>
 #include <guise-serialize/server_in.h>
@@ -12,7 +11,6 @@
 #include <guise-server-lib/user.h>
 #include <guise-server-lib/user_session.h>
 #include <inttypes.h>
-
 
 /// Try to login a user and creates a user session on success
 /// @param self guise server
@@ -51,8 +49,11 @@ int guiseReqUserLogin(GuiseServer* self, const NetworkAddress* address, const ui
         return err;
     }
 
-    CLOG_C_DEBUG(&self->log, "logged in user '%s' and created user session %" PRIx64, foundUser->name.utf8,
-                 foundSession->userSessionId)
+    char tempAddressString[32];
+    CLOG_C_DEBUG(&self->log,
+                 "logged in user '%s' (userID: %" PRIX64 ") and created user session %" PRIx64 " from IP:%s",
+                 foundUser->name.utf8, foundUser->id, foundSession->userSessionId,
+                 networkAddressToString(address, tempAddressString, 32))
 
     GuiseSerializeAddress serializeAddress;
     networkAddressToSerializeAddress(&serializeAddress, foundSession->address);
