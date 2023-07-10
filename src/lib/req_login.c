@@ -49,7 +49,7 @@ int guiseReqUserLogin(GuiseServer* self, const NetworkAddress* address, const ui
         return err;
     }
 
-    char tempAddressString[32];
+    CLOG_EXECUTE(char tempAddressString[32];)
     CLOG_C_DEBUG(&self->log,
                  "logged in user '%s' (userID: %" PRIX64 ") and created user session %" PRIx64 " from IP:%s",
                  foundUser->name.utf8, foundUser->id, foundSession->userSessionId,

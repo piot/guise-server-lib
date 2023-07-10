@@ -8,10 +8,6 @@ name = 'piot/guise-serialize-c'
 version = "*"
 
 [[dependencies]]
-name = 'piot/flood-c'
-version = "*"
-
-[[dependencies]]
 name = 'piot/imprint'
 version = "*"
 
